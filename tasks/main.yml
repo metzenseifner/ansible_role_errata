@@ -1,0 +1,5 @@
+---
+
+- name: Include Redhat tasks
+  include: os/redhat.yml
+  when: (ansible_os_family | lower) == "redhat"

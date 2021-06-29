@@ -1,0 +1,48 @@
+---
+- name: "dnf: Update all packages of type security"
+  dnf:
+    name: '*'
+    state: latest
+    security: true
+    update_cache: true
+  tags: 
+    - security
+
+- name: "dnf: Update all packages of type bugfix"
+  dnf:
+    name: '*'
+    state: latest
+    bugfix: true
+    update_cache: true
+  tags: 
+    - bugfix
+
+- name: "shell: Make a set of all remaining security errata"
+  shell:
+    cmd: 'dnf updateinfo --list --updates --security --quiet'
+  register: _errata_security
+  changed_when: '_errata_security.stdout | length > 0'
+  tags: 
+    - security
+
+- name: "shell: Make a set of all remaining bugfix errata"
+  shell:
+    cmd: 'dnf updateinfo --list --updates --bugfix --quiet'
+  register: _errata_bugfix
+  changed_when: '_errata_bugfix.stdout | length > 0'
+  tags: 
+    - bugfix
+
+- name: "Ensure set of available security errata is the empty set"
+  assert:
+    that:
+      - '{{(_errata_security.stdout | length) == 0}}'
+  tags:
+    - security
+
+- name: "Ensure set of available bugfix errata is the empty set"
+  assert:
+    that:
+      - '{{(_errata_bugfix.stdout | length) == 0}}'
+  tags:
+    - bugfix
