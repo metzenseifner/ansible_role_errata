@@ -1,17 +1,16 @@
 ---
-
 - name: Check whether dnf is available
   shell: 
     cmd: "command -v dnf"
   register: _errata_dnf_exists
-  ignore_errors: true
+  ignore_errors: true 
   changed_when: false
   failed_when: false
 
 - name: Include DNF tasks if dnf is available
-  include: pkg_manager/dnf.yml
-  when: _errata_dnf_exists.rc | int == 0
+  include_tasks: pkg_manager/dnf.yml
+  when: (_errata_dnf_exists.rc | int) == 0
 
 - name: Include YUM tasks if dnf is not available
-  include: pkg_manager/yum.yml
-  when: _errata_dnf_exists.rc | int == 1
+  include_tasks: pkg_manager/yum.yml
+  when: (_errata_dnf_exists.rc | int) == 1
